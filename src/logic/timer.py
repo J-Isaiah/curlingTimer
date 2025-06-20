@@ -27,5 +27,8 @@ class Timer:
 
 
 if __name__ == '__main__':
-    pass
-
+    start = Timer(time.time())
+    print(start.is_pre_game())
+    print(start.is_game_over())
+    while True:
+        print(start.get_remaining_game_time())
