@@ -20,6 +20,7 @@ class GameConfig:
     def __init__(self):
         self._current_state = GameState.MENU
         self._game_mode = GameMode.FOURS
+        self._start_time = 0
 
     def change_state(self, new_state):
         if not isinstance(new_state, GameState):
