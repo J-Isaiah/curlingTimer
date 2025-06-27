@@ -5,7 +5,7 @@ from src.logic.timer import Timer
 
 
 class GameManager:
-    def __init__(self, config: GameConfig, scheduled_start_time: float):
+    def __init__(self, config: GameConfig, scheduled_start_time: float = time.time()):
         self.config = config
         self._scheduled_start_time = scheduled_start_time
 
