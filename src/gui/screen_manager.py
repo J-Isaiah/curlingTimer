@@ -15,27 +15,32 @@ class ScreenManager:
         self.init_menu()
 
     def init_menu(self):
-        button_height = self.screen_height // 4
+        button_height = self.screen_height // 6
         button_width = self.screen_width // 2
+        spacing = self.screen_height // 20
+
+        total_height = 2 * button_height + spacing
+
+        start_y = (self.screen_height - total_height) // 2
 
         button_center_x = (self.screen_width - button_width) // 2
-        button_center_y = (self.screen_height - button_height) // 2
+        y_doubles = start_y
+        y_fours = y_doubles + button_height + spacing
 
         game_mode_fours = Button(
-            rect=(button_center_x, button_center_y + button_height // 2, button_width, button_height),
-            color=(255, 255, 255), text="Fours", text_color=(0, 0, 0),
+            rect=(button_center_x, y_doubles, button_width, button_height),
+            color=(136, 192, 208), text="Fours", text_color=(236, 239, 244),
             font=self.default_font)
         game_mode_doubles = Button(
-            rect=(button_center_x, button_center_y - button_height // 2, button_width, button_height),
-            color=(255, 255, 255), text="Doubles",
-            text_color=(0, 0, 0),
+            rect=(button_center_x, y_fours, button_width, button_height),
+            color=(136, 192, 208), text="Doubles",
+            text_color=(236, 239, 244),
             font=self.default_font)
 
         self.menu_buttons[GameMode.FOURS] = game_mode_fours
         self.menu_buttons[GameMode.DOUBLES] = game_mode_doubles
 
     def draw_menu(self):
-        self.screen.fill("gray")
         for button in self.menu_buttons.values():
             button.draw(self.screen)
         pygame.display.flip()

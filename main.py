@@ -21,7 +21,6 @@ def menu_state(screen_manager):
     return new_state, screen_manager
 
 
-
 def start_game(game_manager: GameManager):
     game_manager.start_game()
     return GameState.START
@@ -36,7 +35,7 @@ def main():
     screen_height = info.current_h
 
     screen = pygame.display.set_mode((screen_width, screen_height), pygame.RESIZABLE)
-    screen.fill("gray")
+    screen.fill((46, 52, 64))
 
     game_config = GameConfig()
     current_state = game_config.current_state
