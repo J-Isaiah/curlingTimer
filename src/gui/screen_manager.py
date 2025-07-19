@@ -1,6 +1,7 @@
 import pygame
 
 from src.gui.button import Button
+from src.gui.text_formats import draw_header
 from src.logic.game_config import GameState, GameMode
 
 
@@ -10,11 +11,15 @@ class ScreenManager:
         self.screen_width = screen_width
         self.screen_height = screen_height
         self.default_font = pygame.font.SysFont(None, 36, bold=True)
+        self.default_background_color = (46, 52, 64)
 
         self.menu_buttons: dict[GameMode, Button] = {}
         self.init_menu()
 
     def init_menu(self):
+        self.screen.fill(self.default_background_color)
+
+        draw_header(screen=self.screen, screen_width=self.screen_width, screen_height=self.screen_height, text='Menu')
         button_height = self.screen_height // 6
         button_width = self.screen_width // 2
         spacing = self.screen_height // 20
@@ -43,4 +48,10 @@ class ScreenManager:
     def draw_menu(self):
         for button in self.menu_buttons.values():
             button.draw(self.screen)
+        pygame.display.flip()
+
+    def init_settings(self):
+        self.screen.fill(self.default_background_color)
+        draw_header(self.screen, self.screen_width, self.screen_height, text="Settings")
+
         pygame.display.flip()

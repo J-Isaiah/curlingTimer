@@ -15,7 +15,6 @@ def menu_state(screen_manager, game_config):
             if event.type == pygame.MOUSEBUTTONDOWN:
                 for mode, button in screen_manager.menu_buttons.items():
                     if button.is_clicked(event):
-                        screen_manager.screen.fill((46, 52, 64))
                         new_state = GameState.SETTINGS
                         game_config.change_game_mode(mode)
                         game_config.change_state(new_state)
@@ -37,7 +36,6 @@ def main():
     screen_height = info.current_h
 
     screen = pygame.display.set_mode((screen_width, screen_height), pygame.RESIZABLE)
-    screen.fill((46, 52, 64))
 
     game_config = GameConfig()
     screen_manager = ScreenManager(screen, screen_width, screen_height)
@@ -55,7 +53,9 @@ def main():
 
         if game_config.current_state == GameState.START:
             game_manager = GameManager(game_config, scheduled_start_time=time.time())
-            current_state = start_game(game_manager)
+
+        if game_config.current_state == GameState.SETTINGS:
+            screen_manager.init_settings()
 
         clock.tick(30)
     pygame.quit()
