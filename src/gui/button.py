@@ -29,4 +29,5 @@ class Button:
         screen.blit(self.text_surface, self.text_rect)
 
     def is_clicked(self, event: Event) -> bool:
+        print('Mouse Button Is clicked')
         return event.type == pygame.MOUSEBUTTONDOWN and self.rect.collidepoint(event.pos)

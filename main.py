@@ -8,17 +8,19 @@ from src.logic.game_manager import GameManager
 from src.logic.timer import Timer
 
 
-def menu_state(screen_manager):
+def menu_state(screen_manager, game_config):
     new_state = GameState.MENU
-    while True:
+    while new_state == GameState.MENU:
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                exit()
-            if event.type == pygame.KEYDOWN:
-                new_state = GameState.START
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                for mode, button in screen_manager.menu_buttons.items():
+                    if button.is_clicked(event):
+                        screen_manager.screen.fill((46, 52, 64))
+                        new_state = GameState.SETTINGS
+                        game_config.change_game_mode(mode)
+                        game_config.change_state(new_state)
         screen_manager.draw_menu()
-    return new_state, screen_manager
+    return screen_manager, game_config
 
 
 def start_game(game_manager: GameManager):
@@ -38,7 +40,6 @@ def main():
     screen.fill((46, 52, 64))
 
     game_config = GameConfig()
-    current_state = game_config.current_state
     screen_manager = ScreenManager(screen, screen_width, screen_height)
     game_manager = None
 
@@ -47,13 +48,15 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+                quit(1)
 
-        if current_state == GameState.MENU:
-            current_state, screen_manager = menu_state(screen_manager)
+        if game_config.current_state == GameState.MENU:
+            screen_manager, game_config = menu_state(screen_manager, game_config)
 
-        if current_state == GameState.START:
+        if game_config.current_state == GameState.START:
             game_manager = GameManager(game_config, scheduled_start_time=time.time())
             current_state = start_game(game_manager)
+
         clock.tick(30)
     pygame.quit()
 
