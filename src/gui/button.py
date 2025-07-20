@@ -10,10 +10,11 @@ class Button:
     def __init__(
             self,
             rect: Tuple[int, int, int, int],
-            color: Tuple[int, int, int],
-            text: str,
+
             font: Font,
-            text_color: Tuple[int, int, int]
+            color: Tuple[int, int, int] = (136, 192, 208),
+            text_color: Tuple[int, int, int] =(236, 239, 244),
+            text: str = 'Text Missing',
     ) -> None:
         self.rect: Rect = pygame.Rect(rect)
         self.color: Tuple[int, int, int] = color

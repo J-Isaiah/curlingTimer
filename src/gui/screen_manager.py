@@ -1,8 +1,11 @@
 import pygame
 
 from src.gui.button import Button
-from src.gui.text_formats import draw_header
-from src.logic.game_config import GameState, GameMode
+from src.gui.text_formats import draw_header, draw_text
+from src.logic.Helper.round_time import get_time_rounded_to_nearest_15_min
+from src.gui.duration_selector import DurationSelector
+from src.logic.game_config import GameMode
+from src.gui.time_selector import TimeSelector
 
 
 class ScreenManager:
@@ -10,8 +13,10 @@ class ScreenManager:
         self.screen = screen
         self.screen_width = screen_width
         self.screen_height = screen_height
-        self.default_font = pygame.font.SysFont(None, 36, bold=True)
+        self.default_font = pygame.font.SysFont('Segoe UI', max(36, screen_height // 24), bold=True)
         self.default_background_color = (46, 52, 64)
+        self.start_selector = None
+        self.duration_selector = None
 
         self.menu_buttons: dict[GameMode, Button] = {}
         self.init_menu()
@@ -20,6 +25,7 @@ class ScreenManager:
         self.screen.fill(self.default_background_color)
 
         draw_header(screen=self.screen, screen_width=self.screen_width, screen_height=self.screen_height, text='Menu')
+
         button_height = self.screen_height // 6
         button_width = self.screen_width // 2
         spacing = self.screen_height // 20
@@ -34,12 +40,11 @@ class ScreenManager:
 
         game_mode_fours = Button(
             rect=(button_center_x, y_doubles, button_width, button_height),
-            color=(136, 192, 208), text="Fours", text_color=(236, 239, 244),
+            text="Fours",
             font=self.default_font)
         game_mode_doubles = Button(
             rect=(button_center_x, y_fours, button_width, button_height),
-            color=(136, 192, 208), text="Doubles",
-            text_color=(236, 239, 244),
+            text="Doubles",
             font=self.default_font)
 
         self.menu_buttons[GameMode.FOURS] = game_mode_fours
@@ -50,8 +55,33 @@ class ScreenManager:
             button.draw(self.screen)
         pygame.display.flip()
 
-    def init_settings(self):
+    def init_and_draw_settings(self, game_mode: GameMode):
+        button_height = self.screen_height // 16
+        button_width = self.screen_width // 8
+        total_height = 2 * button_height
+        start_y = (self.screen_height - total_height) // 1
+        button_center_x = (self.screen_width - button_width) // 2
+
         self.screen.fill(self.default_background_color)
         draw_header(self.screen, self.screen_width, self.screen_height, text="Settings")
 
+        draw_text(self.screen, f'Game Mode: {game_mode.value.capitalize()}', self.screen_width, self.screen_height,
+                  size_ratio=1 / 12,
+                  position_ratio=(.5, .3), center=True,)
+        now = get_time_rounded_to_nearest_15_min()
+
+        w, h = self.screen_width // 2, self.screen_height // 10
+        font_size = h // 2
+
+        self.start_selector = TimeSelector(self.screen, self.screen_width // 4, int(self.screen_height * 0.42),
+                                           w, h, font_size, now, label="Game Start Time", )
+
+        self.duration_selector = DurationSelector(self.screen, self.screen_width // 4, int(self.screen_height * 0.62),
+                                                  w, h, font_size, initial_minutes=120, label="Game Duration")
+
+        start_game = Button(rect=(button_center_x, start_y, button_width, button_height), font=self.default_font,
+                            text='Start Game')
+        start_game.draw(self.screen)
+        self.start_selector.draw()
+        self.duration_selector.draw()
         pygame.display.flip()
