@@ -56,5 +56,5 @@ class DurationSelector:
                 self.minutes += self.step
             self.last_checked_time = now
 
-    def get_duration_minutes(self):
-        return self.minutes
+    def get_duration_seconds(self):
+        return self.minutes * 60

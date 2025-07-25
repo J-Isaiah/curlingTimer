@@ -10,6 +10,7 @@ from src.gui.time_selector import TimeSelector
 
 class ScreenManager:
     def __init__(self, screen, screen_width, screen_height):
+        self.start_game_button = None
         self.screen = screen
         self.screen_width = screen_width
         self.screen_height = screen_height
@@ -28,7 +29,7 @@ class ScreenManager:
 
         button_height = self.screen_height // 6
         button_width = self.screen_width // 2
-        spacing = self.screen_height // 20
+        spacing = self.screen_height // 10
 
         total_height = 2 * button_height + spacing
 
@@ -46,16 +47,16 @@ class ScreenManager:
             rect=(button_center_x, y_fours, button_width, button_height),
             text="Doubles",
             font=self.default_font)
-
-        self.menu_buttons[GameMode.FOURS] = game_mode_fours
         self.menu_buttons[GameMode.DOUBLES] = game_mode_doubles
+        self.menu_buttons[GameMode.FOURS] = game_mode_fours
 
     def draw_menu(self):
         for button in self.menu_buttons.values():
             button.draw(self.screen)
         pygame.display.flip()
+        pygame.event.clear()
 
-    def init_and_draw_settings(self, game_mode: GameMode):
+    def init_and_draw_settings(self, game_mode: GameMode, ):
         button_height = self.screen_height // 16
         button_width = self.screen_width // 8
         total_height = 2 * button_height
@@ -67,7 +68,7 @@ class ScreenManager:
 
         draw_text(self.screen, f'Game Mode: {game_mode.value.capitalize()}', self.screen_width, self.screen_height,
                   size_ratio=1 / 12,
-                  position_ratio=(.5, .3), center=True,)
+                  position_ratio=(.5, .3), center=True, )
         now = get_time_rounded_to_nearest_15_min()
 
         w, h = self.screen_width // 2, self.screen_height // 10
@@ -75,13 +76,19 @@ class ScreenManager:
 
         self.start_selector = TimeSelector(self.screen, self.screen_width // 4, int(self.screen_height * 0.42),
                                            w, h, font_size, now, label="Game Start Time", )
+        if game_mode == GameMode.FOURS:
+            initial_game_duration = 120
+        else:
+            initial_game_duration = 90
 
         self.duration_selector = DurationSelector(self.screen, self.screen_width // 4, int(self.screen_height * 0.62),
-                                                  w, h, font_size, initial_minutes=120, label="Game Duration")
+                                                  w, h, font_size, initial_minutes=initial_game_duration,
+                                                  label="Game Duration")
 
-        start_game = Button(rect=(button_center_x, start_y, button_width, button_height), font=self.default_font,
-                            text='Start Game')
-        start_game.draw(self.screen)
+        self.start_game_button = Button(rect=(button_center_x, start_y, button_width, button_height),
+                                        font=self.default_font,
+                                        text='Start Game')
+        self.start_game_button.draw(self.screen)
         self.start_selector.draw()
         self.duration_selector.draw()
         pygame.display.flip()

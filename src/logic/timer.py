@@ -6,6 +6,7 @@ class Timer:
         self._start_time = scheduled_start_time
         self._game_end_time = self._start_time + game_length
 
+    @property
     def is_pre_game(self) -> bool:
         return time.time() < self._start_time
 
@@ -16,19 +17,20 @@ class Timer:
         return time.time() > self._game_end_time
 
     def get_remaining_game_time(self) -> float:
-        if self.is_pre_game():
+        if self.is_pre_game:
+            print('Not Supposed to be here')
             return 0.0
-        return max(0.0, self._game_end_time - time.time())
+        return max(0.0, self._game_end_time) - time.time()
 
     def get_elapsed_game_time(self) -> float:
-        if self.is_pre_game():
+        if self.is_pre_game:
             return 0.0
         return min(time.time() - self._start_time, self._game_end_time - self._start_time)
 
 
 if __name__ == '__main__':
     start = Timer(time.time())
-    print(start.is_pre_game())
+    print(start.is_pre_game)
     print(start.is_game_over())
     while True:
         print(start.get_remaining_game_time())
