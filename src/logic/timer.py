@@ -27,6 +27,9 @@ class Timer:
             return 0.0
         return min(time.time() - self._start_time, self._game_end_time - self._start_time)
 
+    def get_remaining_pre_game_time(self):
+        return self._start_time - time.time() if self.is_pre_game else 0.0
+
 
 if __name__ == '__main__':
     start = Timer(time.time())
