@@ -101,6 +101,10 @@ class RockTracker:
     def is_last_end(self):
         return True if (self._ends_left ==1) else False
 
+    @property
+    def get_current_end(self):
+        return self._current_end
+
 
 class DoublesTracker(RockTracker):
     def __init__(self):

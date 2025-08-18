@@ -3,12 +3,22 @@ import time
 
 class Timer:
     def __init__(self, scheduled_start_time: float, game_length: float = 7200):
+        self._game_length = game_length
         self._start_time = scheduled_start_time
         self._game_end_time = self._start_time + game_length
+        self._total_break_time = scheduled_start_time-time.time()
 
     @property
     def is_pre_game(self) -> bool:
         return time.time() < self._start_time
+
+    @property
+    def get_pre_game_duration(self):
+        return self._total_break_time
+
+    @property
+    def get_game_length(self):
+        return self._game_length
 
     def get_pre_game_time(self) -> float:
         return max(0.0, self._start_time - time.time())

@@ -1,11 +1,15 @@
 import time
 
 import pygame
+import sys
 
+from src.gui.count_down_screen import draw_play_screen, end_game_screen
 from src.gui.screen_manager import ScreenManager
 from src.logic.game_config import GameConfig, GameState
 from src.logic.game_manager import GameManager, GameManagerStates
 from src.logic.timer import Timer
+
+
 
 
 def menu_state(screen_manager):
@@ -40,6 +44,24 @@ def start_game(game_manager: GameManager):
 
 
 def main():
+    def restart_to_menu():
+        nonlocal game_manager, current_game_running, setup_done, showing_end_screen
+
+        # keep game_config as-is (mode, durations, etc.)
+        game_config.change_state(GameState.MENU)
+
+        # drop per-run objects/flags only
+        game_manager = None
+        current_game_running = False
+        setup_done = {
+            GameState.MENU: False,
+            GameState.SETTINGS: False,
+            GameState.START: False,
+        }
+
+        showing_end_screen = False
+
+
     pygame.init()
     clock = pygame.time.Clock()
 
@@ -54,6 +76,7 @@ def main():
     game_manager = None
 
     running = True
+    showing_end_screen = False
 
     setup_done = {
         GameState.MENU: False,
@@ -62,10 +85,15 @@ def main():
     }
 
     current_game_running = False
+    combo_latch = False
 
     while running:
         # Handles Event Listeners
         for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_r:
+                if game_config.current_state == GameState.START and not showing_end_screen:
+                    showing_end_screen = True
+                    continue  # skip normal handling this frame
             if event.type == pygame.QUIT:
                 running = False
                 quit(1)
@@ -84,7 +112,16 @@ def main():
                     if game_start:
                         print('Game Start Button Has been Clicked' * 100)
                         game_config.change_state(GameState.START)
-
+            if showing_end_screen:
+                if end_game_screen(screen, event=event) is True:
+                    screen.fill((46, 52, 64))# "New Game"
+                    restart_to_menu()
+                continue
+        if showing_end_screen:
+            end_game_screen(screen)  # draw-only
+            pygame.display.flip()
+            clock.tick(30)
+            continue
         # Handles Screen Renders
         if game_config.current_state == GameState.MENU:
             menu_state(screen_manager)
@@ -106,14 +143,15 @@ def main():
                     # Pre Game Count Down
                     print(game_manager.get_timer.get_pre_game_time())
                     print('still in if')
+                    draw_play_screen(screen, current_end=None, is_set_up_time=True,time_left=game_manager.get_timer.get_pre_game_time(),height=screen_height,width=screen_width, total_time=game_manager.get_timer.get_pre_game_duration)
                 else:
                     print('game Has Started')
                     remaining_game_time = game_manager.get_timer.get_remaining_game_time()
                     print('remaining game time', remaining_game_time)
 
-                    if remaining_game_time < 0:
+                    if remaining_game_time < 0: # Game End Protocal
                         print('Should not ber her')
-                        # Game End protocol
+                        showing_end_screen = True
                     else:
                         # Continue game protocol
                         print('BOOL CHECK', game_manager.get_rock_tracker.is_end_over,
@@ -134,11 +172,13 @@ def main():
                         elif game_manager.get_rock_tracker.get_ends_left() >= 0:
                             print('handle game time')
                             game_manager_state = game_manager.handle_end()
+                            draw_play_screen(screen, current_end=game_manager.get_rock_tracker.get_current_end, is_set_up_time=False,time_left=game_manager.get_timer.get_remaining_game_time(),height=screen_height, width=screen_width, total_time=game_manager.get_timer.get_game_length)
                             if game_manager_state == GameManagerStates.LAST_END:
                                 print('we are on the last end')
                                 quit()
                             # play time logic
-                print('Else block end')
+
+
 
         # Rock update logic here
         pygame.display.flip()
