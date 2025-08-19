@@ -109,9 +109,7 @@ class RockTracker:
 class DoublesTracker(RockTracker):
     def __init__(self):
         super().__init__(total_rocks=10, end_break=10)
-        self.time_mapping = [.01, .01, .01, .01, .01]
-        self._end_break = 5
-        # self.time_mapping = [55, 55, 60, 60, 65]
+        self.time_mapping = [55, 55, 60, 60, 65]
         print('DOUBLES TRACKER CREATED ')
 
 
