@@ -47,9 +47,11 @@ class RockTracker:
         self.current_end_break = 0
         self.in_end_break = False
         self.end_started = False
-        self.is_first_end = False
+        self.is_first_end = True
+        self.is_last_end = False
 
     def start_new_end(self):
+
         print('starting new end')
         self.rocks_remaining_in_the_end = self._total_rocks_per_end
         self.current_rock = 0
@@ -63,10 +65,11 @@ class RockTracker:
                 rock.reset_rock_status()
         self.end_started = True
         self.in_end_break = False
-        if not self.is_first_end: # Shitty fix for double call issue
-            self.is_first_end = True
-            self._current_end += 1
-            self._full_ends_left -= 1
+        if self.is_first_end:  # Shitty fix for double call issue
+            self.is_first_end = False
+            return
+        self._current_end += 1
+        self._full_ends_left -= 1
 
     def mark_rock_as_thrown(self):
         if self.current_rock < self._total_rocks_per_end:
@@ -117,6 +120,7 @@ class DoublesTracker(RockTracker):
 
 class FoursTracker(RockTracker):
     def __init__(self):
-        super(FoursTracker, self).__init__(total_rocks=16, end_break=60)
-        self.time_mapping = [45, 45, 45, 50, 55, 60, 65, 65]
+        super(FoursTracker, self).__init__(total_rocks=16, end_break=.1)
+        # self.time_mapping = [45, 45, 45, 50, 55, 60, 65, 65]
+        self.time_mapping = [.01, .01, .01, .01, .01, .01, .01, .01]
         print('FOURSE TRACKER CREATED ')

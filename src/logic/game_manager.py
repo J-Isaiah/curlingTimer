@@ -90,8 +90,10 @@ class GameManager:
             self.get_rock_tracker.start_end_break()
             self.break_completed = False
 
-        if self.get_rock_tracker.is_last_end():
+        if self.get_rock_tracker.is_last_end:
             self.change_game_state_to_game_over()
+            if self._cur_game_state == GameManagerStates.GAME_OVER:
+                return GameManagerStates.GAME_OVER
             return GameManagerStates.LAST_END
 
         return GameManagerStates.END_START

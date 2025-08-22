@@ -1,9 +1,9 @@
 import pygame
 import sys
 
-
 import sys
 import pygame
+
 
 def end_game_screen(screen_manager, game_config=None, event=None):
     screen = screen_manager
@@ -14,7 +14,7 @@ def end_game_screen(screen_manager, game_config=None, event=None):
     screen.fill((0, 0, 0))
     border_thickness = max(2, int(u * 0.004))
     inset = max(6, int(u * 0.01))
-    border_rect = pygame.Rect(inset, inset, w - 2*inset, h - 2*inset)
+    border_rect = pygame.Rect(inset, inset, w - 2 * inset, h - 2 * inset)
     pygame.draw.rect(screen, (0, 128, 255), border_rect, width=border_thickness)
 
     # --- text ---
@@ -24,11 +24,11 @@ def end_game_screen(screen_manager, game_config=None, event=None):
     font_bot = pygame.font.SysFont("Courier New", size_bot, bold=True)
     white = (255, 255, 255)
 
-    good_surf    = font_top.render("Good",    False, white)
+    good_surf = font_top.render("Good", False, white)
     curling_surf = font_bot.render("Curling", False, white)
 
-    left_margin   = int(w * 0.05)
-    top_margin    = int(h * 0.08)
+    left_margin = int(w * 0.05)
+    top_margin = int(h * 0.08)
     bottom_margin = int(h * 0.22)  # a bit larger to make room for buttons
 
     x = border_rect.left + left_margin
@@ -47,10 +47,11 @@ def end_game_screen(screen_manager, game_config=None, event=None):
     btn_y = border_rect.bottom - btn_h - int(h * 0.06)
     btn_x_start = (w - total_w) // 2
 
-    new_rect  = pygame.Rect(btn_x_start, btn_y, btn_w, btn_h)
+    new_rect = pygame.Rect(btn_x_start, btn_y, btn_w, btn_h)
     quit_rect = pygame.Rect(btn_x_start + btn_w + btn_gap, btn_y, btn_w, btn_h)
 
     mouse_pos = pygame.mouse.get_pos()
+
     def draw_button(rect, label, hovered):
         base = (230, 230, 230) if not hovered else (255, 255, 255)
         edge = (30, 30, 30)
@@ -60,8 +61,8 @@ def end_game_screen(screen_manager, game_config=None, event=None):
         txt = f.render(label, True, (0, 0, 0))
         screen.blit(txt, txt.get_rect(center=rect.center))
 
-    draw_button(new_rect,  "New Game", new_rect.collidepoint(mouse_pos))
-    draw_button(quit_rect, "Quit",     quit_rect.collidepoint(mouse_pos))
+    draw_button(new_rect, "New Game", new_rect.collidepoint(mouse_pos))
+    draw_button(quit_rect, "Quit", quit_rect.collidepoint(mouse_pos))
 
     # --- click handling ---
     if event and event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
@@ -74,24 +75,22 @@ def end_game_screen(screen_manager, game_config=None, event=None):
     return False
 
 
-
-
-def setup_timer(screen, time_left: float, total_time, is_set_up_time, h, w, current_end):
-    if is_set_up_time: # set up time
+def setup_timer(screen, time_left: float, total_time, is_set_up_time, h, w, current_end=None
+                , is_break_time=None):
+    if is_set_up_time:  # set up time
         screen.fill((164, 160, 112))
-        bar_color=(255,255,0)
-        top_text = 'Set Up Time left...'
-    elif time_left <= 0: # ends game
+        bar_color = (255, 255, 0)
+    elif is_break_time:
+        screen.fill((77, 77, 77))
+        bar_color = (0, 195, 255)
+    elif time_left <= 0 or current_end <=0:  # ends game
         end_game_screen(screen)
-    elif current_end >=8 or time_left <=900:
-        top_text = 'Final End...'
-        screen.fill((139,0,0))
-        bar_color = 0,255,0
-    else: # Game time
-        top_text = f'End {current_end} of 8'
+    elif current_end >= 8 or time_left <= 900:
+        screen.fill((139, 0, 0))
+        bar_color = 0, 255, 0
+    else:  # Game time
         screen.fill((1, 61, 1))
-        bar_color=(0,255,0)
-
+        bar_color = (0, 255, 0)
 
     # Bar size
     bar_w = w * 0.65
@@ -108,7 +107,7 @@ def setup_timer(screen, time_left: float, total_time, is_set_up_time, h, w, curr
 
     font = pygame.font.SysFont(None, int(bar_h * 0.6))
     if time_left > 3600:
-        time_text = f"{int((time_left // 3600))}:{int((time_left % 3600)//60):02d}:{int(time_left % 60):02d}"
+        time_text = f"{int((time_left // 3600))}:{int((time_left % 3600) // 60):02d}:{int(time_left % 60):02d}"
     elif time_left > 60:
         time_text = f"{int(time_left // 60):02d}:{int(time_left % 60):02d}"
     else:
@@ -117,9 +116,13 @@ def setup_timer(screen, time_left: float, total_time, is_set_up_time, h, w, curr
     text_rect = time_text.get_rect(center=(w / 2, bar_y + bar_h / 2))
     screen.blit(time_text, text_rect)
 
-def draw_headding(screen, current_end: int, is_set_up_time: bool, h: int, w: int, time_left: float):
+
+def draw_headding(screen, current_end: int, is_set_up_time: bool, h: int, w: int, time_left: float, is_break_time=None,
+                  break_time_left=None):
     if is_set_up_time:
         text = "Set UP"
+    elif is_break_time:
+        text = f"End Starts in {int(break_time_left)}"
     elif current_end >= 8 or time_left <= 900:
         text = f"End {current_end} of 8 (Final)"
     else:
@@ -146,11 +149,14 @@ def draw_headding(screen, current_end: int, is_set_up_time: bool, h: int, w: int
 
     screen.blit(text_surface, text_rect)
 
-def draw_play_screen(screen, current_end, is_set_up_time: bool, time_left: float, height, width, total_time):
 
+def draw_play_screen(screen, current_end, is_set_up_time: bool, time_left: float, height, width, total_time,
+                     is_break_time=None, break_time_left=None):
+    print('Play SCREEN print function', is_break_time, break_time_left)
     setup_timer(screen=screen, time_left=time_left, total_time=total_time,
-                is_set_up_time=is_set_up_time, h=height, w=width, current_end=current_end)
-    draw_headding(screen, current_end, is_set_up_time, height, width, time_left)
+                is_set_up_time=is_set_up_time, h=height, w=width, current_end=current_end, is_break_time=is_break_time)
+    draw_headding(screen, current_end, is_set_up_time, height, width, time_left, is_break_time, break_time_left)
+
 
 if __name__ == "__main__":
     pygame.init()
@@ -199,4 +205,3 @@ if __name__ == "__main__":
 
     pygame.quit()
     sys.exit()
-
