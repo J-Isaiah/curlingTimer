@@ -98,7 +98,7 @@ class RockTracker:
         return max(self.break_end_time - time.time(), 0)
 
     def get_current_rock(self):
-        return self._displayed_rocks[self.current_rock]
+        return self._displayed_rocks[self.current_rock] if self._displayed_rocks else None
 
     def get_ends_left(self):
         return self._full_ends_left
@@ -120,7 +120,6 @@ class DoublesTracker(RockTracker):
 
 class FoursTracker(RockTracker):
     def __init__(self):
-        super(FoursTracker, self).__init__(total_rocks=16, end_break=.1)
-        # self.time_mapping = [45, 45, 45, 50, 55, 60, 65, 65]
-        self.time_mapping = [.01, .01, .01, .01, .01, .01, .01, .01]
+        super(FoursTracker, self).__init__(total_rocks=16, end_break=5)
+        self.time_mapping = [45, 45, 45, 50, 55, 60, 65, 65]
         print('FOURSE TRACKER CREATED ')

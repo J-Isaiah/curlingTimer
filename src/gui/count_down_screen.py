@@ -1,8 +1,7 @@
 import pygame
 import sys
 
-import sys
-import pygame
+from src.logic.game_manager import GameManager
 
 
 def end_game_screen(screen_manager, game_config=None, event=None):
@@ -75,19 +74,19 @@ def end_game_screen(screen_manager, game_config=None, event=None):
     return False
 
 
-def setup_timer(screen, time_left: float, total_time, is_set_up_time, h, w, current_end=None
-                , is_break_time=None):
+def setup_timer(screen, time_left: float, total_time, is_set_up_time, h, w, current_end=None,
+                is_break_time=None):
     if is_set_up_time:  # set up time
         screen.fill((164, 160, 112))
         bar_color = (255, 255, 0)
     elif is_break_time:
         screen.fill((77, 77, 77))
         bar_color = (0, 195, 255)
-    elif time_left <= 0 or current_end <=0:  # ends game
+    elif time_left <= 0 or current_end <= 0:  # ends game
         end_game_screen(screen)
     elif current_end >= 8 or time_left <= 900:
         screen.fill((139, 0, 0))
-        bar_color = 0, 255, 0
+        bar_color = (0, 255, 0)
     else:  # Game time
         screen.fill((1, 61, 1))
         bar_color = (0, 255, 0)
@@ -102,8 +101,8 @@ def setup_timer(screen, time_left: float, total_time, is_set_up_time, h, w, curr
     progress_ratio = max(0, min(1, time_left / total_time))
     progress_width = bar_w * progress_ratio
     pygame.draw.rect(screen, (60, 60, 60), (bar_x, bar_y, bar_w, bar_h), border_radius=10)
-
-    pygame.draw.rect(screen, bar_color, (bar_x, bar_y, progress_width, bar_h), border_radius=10)
+    fill_x = bar_x + (bar_w - progress_width)
+    pygame.draw.rect(screen, bar_color, (fill_x, bar_y, progress_width, bar_h), border_radius=10)
 
     font = pygame.font.SysFont(None, int(bar_h * 0.6))
     if time_left > 3600:
@@ -117,8 +116,8 @@ def setup_timer(screen, time_left: float, total_time, is_set_up_time, h, w, curr
     screen.blit(time_text, text_rect)
 
 
-def draw_headding(screen, current_end: int, is_set_up_time: bool, h: int, w: int, time_left: float, is_break_time=None,
-                  break_time_left=None):
+def draw_headding(screen, current_end: int, is_set_up_time: bool, h: int, w: int, time_left: float,
+                  is_break_time=None, break_time_left=None):
     if is_set_up_time:
         text = "Set UP"
     elif is_break_time:
@@ -126,7 +125,6 @@ def draw_headding(screen, current_end: int, is_set_up_time: bool, h: int, w: int
     elif current_end >= 8 or time_left <= 900:
         text = f"End {current_end} of 8 (Final)"
     else:
-        print(current_end)
         text = f"End {current_end} of 8"
 
     font_size = max(18, int(h * 0.08))
@@ -150,41 +148,103 @@ def draw_headding(screen, current_end: int, is_set_up_time: bool, h: int, w: int
     screen.blit(text_surface, text_rect)
 
 
-def draw_play_screen(screen, current_end, is_set_up_time: bool, time_left: float, height, width, total_time,
-                     is_break_time=None, break_time_left=None):
-    print('Play SCREEN print function', is_break_time, break_time_left)
+def draw_rocks(screen, current_end: int, is_set_up_time: bool, h: int, w: int,
+               time_left, is_break_time, break_time_left, gm: GameManager):
+    # --- Rock box ---
+    box_top = int(h * 0.45)
+    box_bottom = int(h * 0.98)
+    box_height = box_bottom - box_top
+    box_width = w * 0.95
+
+    cols = 8
+    rows = 2
+    gap_ratio = 0.05
+
+    stone_size_x = box_width / (cols + (cols - 1) * gap_ratio)
+    stone_size_y = box_height / (rows + (rows - 1) * gap_ratio)
+    stone_size = int(min(stone_size_x, stone_size_y))
+    gap = int(stone_size * gap_ratio)
+
+    total_w = cols * stone_size + (cols - 1) * gap
+    total_h = rows * stone_size + (rows - 1) * gap
+    start_x = (w - total_w) // 2
+    start_y = box_top + (box_height - total_h) // 2
+
+    # --- Load images ---
+    red_png = pygame.image.load("yellow_rock.png").convert_alpha()
+    yellow_png = pygame.image.load("red_rock.png").convert_alpha()
+    red_stone = pygame.transform.smoothscale(red_png, (stone_size, stone_size))
+    yellow_stone = pygame.transform.smoothscale(yellow_png, (stone_size, stone_size))
+
+    # --- Rocks left ---
+    try:
+        rocks_left = gm.get_rock_tracker.get_rocks_left_in_end
+        percent_thrown = gm.get_rock_tracker.get_current_rock().check_rock_thrown_precent()
+        current_rock_idx = gm.get_rock_tracker.current_rock
+    except Exception:
+        return
+
+    # Max rocks (always 16 for fours)
+    max_rocks = cols * rows
+    rocks_thrown = max_rocks - rocks_left
+
+    # --- Draw column by column ---
+    rock_index = 0
+    for col in range(cols):
+        for row in range(rows):  # row 0 = red, row 1 = yellow
+            x = start_x + col * (stone_size + gap)
+            y = start_y + row * (stone_size + gap)
+
+            if rock_index >= rocks_thrown:
+                stone_surf = red_stone if row == 0 else yellow_stone
+
+                if rock_index == current_rock_idx:
+                    # Eating effect: 0 = full, 1 = gone
+                    visible_w = int(stone_size * (1 - percent_thrown))
+                    if visible_w > 0:
+                        # Clip from the right side instead of left
+                        clip_rect = pygame.Rect(stone_size - visible_w, 0, visible_w, stone_size)
+                        screen.blit(stone_surf, (x + (stone_size - visible_w), y), area=clip_rect)
+
+                else:
+                    screen.blit(stone_surf, (x, y))
+
+            rock_index += 1
+
+
+def draw_play_screen(screen, current_end, is_set_up_time: bool, game_manager, time_left: float, height, width,
+                     total_time, is_break_time=None, break_time_left=None):
     setup_timer(screen=screen, time_left=time_left, total_time=total_time,
                 is_set_up_time=is_set_up_time, h=height, w=width, current_end=current_end, is_break_time=is_break_time)
     draw_headding(screen, current_end, is_set_up_time, height, width, time_left, is_break_time, break_time_left)
+    draw_rocks(screen, current_end, is_set_up_time, height, width, time_left, is_break_time, break_time_left,
+               game_manager)
 
 
 if __name__ == "__main__":
     pygame.init()
     clock = pygame.time.Clock()
 
-    # Start window (resizable)
     screen = pygame.display.set_mode((0, 0), pygame.RESIZABLE)
     pygame.display.set_caption("Curling Timer")
 
-    # Initial state
     is_set_up = False
-    time_left = 100
-    total_time = 600
+    time_left = 10000
+    total_time = 60000
     current_end = 1
 
     running = True
     while running:
-        # --- Handle events ---
         event = None
         for e in pygame.event.get():
             if e.type == pygame.QUIT:
                 running = False
-            elif e.type == pygame.VIDEORESIZE:  # handle resizing
+            elif e.type == pygame.VIDEORESIZE:
                 screen = pygame.display.set_mode((e.w, e.h), pygame.RESIZABLE)
             else:
                 event = e
 
-        time_left -= clock.get_time() / 1000  # subtract seconds
+        time_left -= clock.get_time() / 1000
         if time_left < 0:
             time_left = 0
 

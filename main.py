@@ -143,7 +143,8 @@ def main():
                     print('still in if')
                     draw_play_screen(screen, current_end=None, is_set_up_time=True,
                                      time_left=game_manager.get_timer.get_pre_game_time(), height=screen_height,
-                                     width=screen_width, total_time=game_manager.get_timer.get_pre_game_duration)
+                                     width=screen_width, total_time=game_manager.get_timer.get_pre_game_duration,
+                                     game_manager=game_manager)
                 else:
                     print('game Has Started')
                     remaining_game_time = game_manager.get_timer.get_remaining_game_time()
@@ -179,7 +180,8 @@ def main():
                                              height=screen_height, width=screen_width,
                                              total_time=game_manager.get_timer.get_game_length,
                                              is_break_time=game_manager.get_rock_tracker.is_in_break(),
-                                             break_time_left=game_manager.get_rock_tracker.get_break_time_remaining())
+                                             break_time_left=game_manager.get_rock_tracker.get_break_time_remaining(),
+                                             game_manager=game_manager)
 
 
                         elif game_manager.get_rock_tracker.get_ends_left() >= 0:
@@ -192,7 +194,8 @@ def main():
                                              height=screen_height, width=screen_width,
                                              total_time=game_manager.get_timer.get_game_length,
                                              is_break_time=game_manager.get_rock_tracker.is_in_break(),
-                                             break_time_left=game_manager.get_rock_tracker.get_break_time_remaining())
+                                             break_time_left=game_manager.get_rock_tracker.get_break_time_remaining(),
+                                             game_manager=game_manager)
                             print('Current Gamee State', game_manager_state)
                             if game_manager_state == GameManagerStates.GAME_OVER and game_manager.get_rock_tracker.get_ends_left() <= 0:
                                 showing_end_screen = True
