@@ -1,8 +1,9 @@
+import sys
 import time
 
-from src.logic import rock_tracker
+from src.logic import rock_manager
 from src.logic.game_config import GameConfig, GameMode, GameState
-from src.logic.rock_tracker import RockTracker, FoursTracker, DoublesTracker
+from src.logic.rock_manager import RockTracker, FoursTracker, DoublesTracker
 from src.logic.timer import Timer
 from enum import Enum, nonmember
 
@@ -22,10 +23,9 @@ class GameManager:
         self.game_status = None
         self._timer = None
         self._rock_tracker = None
-        self._current_end = 1
         self._max_end = 8
         self._cur_game_state = nonmember
-        self.break_completed = False
+        self.break_completed = True
 
     def start_game(self):
         self._timer = Timer(self._scheduled_start_time + 3, game_length=self.game_duration)
@@ -39,7 +39,9 @@ class GameManager:
 
     def begin_new_end(self):
         if self._rock_tracker:
+            print('Rock CUrrent end', self.get_rock_tracker.get_current_end)
             self._rock_tracker.start_new_end()
+            print('Rock CUrrent end', self.get_rock_tracker.get_current_end)
             self.break_completed = False
 
     @property

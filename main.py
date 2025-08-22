@@ -88,6 +88,7 @@ def main():
     combo_latch = False
 
     while running:
+
         # Handles Event Listeners
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN and event.key == pygame.K_r:
@@ -162,9 +163,10 @@ def main():
                                 not game_manager.get_rock_tracker.is_end_over and not game_manager.get_rock_tracker.is_in_break())
                                 and not game_manager.get_rock_tracker.end_started):
                             print('creaing new game manager rock')
+
                             game_manager.begin_new_end()  # if rocks remaining == 0 restart end
                             # Trigger break
-                        elif not game_manager.is_break_completed():
+                        elif not game_manager.is_break_completed(): # Error happening here, should not be triggering break right away
                             print('In break loop')
                             # Break Screen
                             game_manager.handle_break()

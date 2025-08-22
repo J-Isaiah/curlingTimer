@@ -37,7 +37,7 @@ class RockTracker:
         self._end_break = end_break
         self.break_end_time = 0
         self.end_break_start_time = 0
-        self._ends_left = 8
+        self._full_ends_left = 8
         self._current_end = 0
         self._total_rocks_per_end = total_rocks
         self.rocks_remaining_in_the_end = self._total_rocks_per_end
@@ -47,13 +47,13 @@ class RockTracker:
         self.current_end_break = 0
         self.in_end_break = False
         self.end_started = False
+        self.is_first_end = False
 
     def start_new_end(self):
         print('starting new end')
         self.rocks_remaining_in_the_end = self._total_rocks_per_end
         self.current_rock = 0
         if len(self._displayed_rocks) == 0:
-            print('should not be here')
             for throw_time in self.time_mapping:
                 self._displayed_rocks.append(Rock(throw_time))
                 self._displayed_rocks.append(Rock(throw_time))
@@ -63,8 +63,10 @@ class RockTracker:
                 rock.reset_rock_status()
         self.end_started = True
         self.in_end_break = False
-        self._current_end += 1
-        self._ends_left -= 1
+        if not self.is_first_end: # Shitty fix for double call issue
+            self.is_first_end = True
+            self._current_end += 1
+            self._full_ends_left -= 1
 
     def mark_rock_as_thrown(self):
         if self.current_rock < self._total_rocks_per_end:
@@ -96,10 +98,10 @@ class RockTracker:
         return self._displayed_rocks[self.current_rock]
 
     def get_ends_left(self):
-        return self._ends_left
+        return self._full_ends_left
 
     def is_last_end(self):
-        return True if (self._ends_left ==1) else False
+        return True if (self._full_ends_left == 1) else False
 
     @property
     def get_current_end(self):

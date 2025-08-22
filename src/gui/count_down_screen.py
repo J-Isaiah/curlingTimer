@@ -92,27 +92,20 @@ def setup_timer(screen, time_left: float, total_time, is_set_up_time, h, w, curr
         screen.fill((1, 61, 1))
         bar_color=(0,255,0)
 
-    # Background color for setup time
 
     # Bar size
     bar_w = w * 0.65
     bar_h = h * 0.14
 
-    # Bar position (centered)
     bar_x = (w - bar_w) / 2
     bar_y = ((h - (h // 3)) - bar_h) / 2
 
-    # Calculate progress
     progress_ratio = max(0, min(1, time_left / total_time))
     progress_width = bar_w * progress_ratio
-
-    # Draw background bar
     pygame.draw.rect(screen, (60, 60, 60), (bar_x, bar_y, bar_w, bar_h), border_radius=10)
 
-    # Draw progress
     pygame.draw.rect(screen, bar_color, (bar_x, bar_y, progress_width, bar_h), border_radius=10)
 
-    # Draw time text
     font = pygame.font.SysFont(None, int(bar_h * 0.6))
     if time_left > 3600:
         time_text = f"{int((time_left // 3600))}:{int((time_left % 3600)//60):02d}:{int(time_left % 60):02d}"
@@ -124,38 +117,86 @@ def setup_timer(screen, time_left: float, total_time, is_set_up_time, h, w, curr
     text_rect = time_text.get_rect(center=(w / 2, bar_y + bar_h / 2))
     screen.blit(time_text, text_rect)
 
+def draw_headding(screen, current_end: int, is_set_up_time: bool, h: int, w: int, time_left: float):
+    if is_set_up_time:
+        text = "Set UP"
+    elif current_end >= 8 or time_left <= 900:
+        text = f"End {current_end} of 8 (Final)"
+    else:
+        print(current_end)
+        text = f"End {current_end} of 8"
+
+    font_size = max(18, int(h * 0.08))
+    font = pygame.font.SysFont("Courier New", font_size, bold=True)
+
+    # Render text
+    text_surface = font.render(text, True, (0, 0, 0))  # black text
+    text_rect = text_surface.get_rect(center=(w // 2, int(h * 0.08)))
+
+    padding_x = int(w * 0.02)
+    padding_y = int(h * 0.01)
+    bg_rect = pygame.Rect(
+        text_rect.left - padding_x,
+        text_rect.top - padding_y,
+        text_rect.width + 2 * padding_x,
+        text_rect.height + 2 * padding_y
+    )
+    pygame.draw.rect(screen, (200, 200, 200), bg_rect, border_radius=6)
+    pygame.draw.rect(screen, (50, 50, 50), bg_rect, width=2, border_radius=6)
+
+    screen.blit(text_surface, text_rect)
 
 def draw_play_screen(screen, current_end, is_set_up_time: bool, time_left: float, height, width, total_time):
+
     setup_timer(screen=screen, time_left=time_left, total_time=total_time,
                 is_set_up_time=is_set_up_time, h=height, w=width, current_end=current_end)
+    draw_headding(screen, current_end, is_set_up_time, height, width, time_left)
 
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     pygame.init()
     clock = pygame.time.Clock()
 
-    info = pygame.display.Info()
-    screen_width = info.current_w
-    screen_height = info.current_h
+    # Start window (resizable)
+    screen = pygame.display.set_mode((0, 0), pygame.RESIZABLE)
+    pygame.display.set_caption("Curling Timer")
 
-    screen = pygame.display.set_mode((screen_width, screen_height), pygame.RESIZABLE)
+    # Initial state
+    is_set_up = False
+    time_left = 100
+    total_time = 600
+    current_end = 1
 
-    is_set_up = True
-    time_left = 600
+    running = True
+    while running:
+        # --- Handle events ---
+        event = None
+        for e in pygame.event.get():
+            if e.type == pygame.QUIT:
+                running = False
+            elif e.type == pygame.VIDEORESIZE:  # handle resizing
+                screen = pygame.display.set_mode((e.w, e.h), pygame.RESIZABLE)
+            else:
+                event = e
 
-    while True:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-
-        # Update timer
         time_left -= clock.get_time() / 1000  # subtract seconds
         if time_left < 0:
             time_left = 0
 
-        draw_play_screen(screen, 3, is_set_up, time_left_in_set_up=time_left,
-                         height=screen_height, width=screen_width)
+        screen_width, screen_height = screen.get_size()
+
+        draw_play_screen(
+            screen,
+            current_end=current_end,
+            is_set_up_time=is_set_up,
+            time_left=time_left,
+            height=screen_height,
+            width=screen_width,
+            total_time=total_time,
+        )
 
         pygame.display.flip()
         clock.tick(30)
+
+    pygame.quit()
+    sys.exit()
+
