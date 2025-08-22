@@ -9,14 +9,12 @@ def end_game_screen(screen_manager, game_config=None, event=None):
     w, h = screen.get_size()
     u = min(w, h)
 
-    # --- background & border ---
     screen.fill((0, 0, 0))
     border_thickness = max(2, int(u * 0.004))
     inset = max(6, int(u * 0.01))
     border_rect = pygame.Rect(inset, inset, w - 2 * inset, h - 2 * inset)
     pygame.draw.rect(screen, (0, 128, 255), border_rect, width=border_thickness)
 
-    # --- text ---
     size_top = max(12, int(h * 0.18))
     size_bot = max(12, int(h * 0.25))
     font_top = pygame.font.SysFont("Courier New", size_top, bold=True)
@@ -28,7 +26,7 @@ def end_game_screen(screen_manager, game_config=None, event=None):
 
     left_margin = int(w * 0.05)
     top_margin = int(h * 0.08)
-    bottom_margin = int(h * 0.22)  # a bit larger to make room for buttons
+    bottom_margin = int(h * 0.22)
 
     x = border_rect.left + left_margin
     y_top = border_rect.top + top_margin
@@ -37,7 +35,6 @@ def end_game_screen(screen_manager, game_config=None, event=None):
     screen.blit(good_surf, (x, y_top))
     screen.blit(curling_surf, (x, y_bot))
 
-    # --- buttons (dynamic sizes) ---
     btn_h = max(36, int(h * 0.10))
     btn_w = max(160, int(w * 0.28))
     btn_gap = int(w * 0.04)
@@ -63,7 +60,6 @@ def end_game_screen(screen_manager, game_config=None, event=None):
     draw_button(new_rect, "New Game", new_rect.collidepoint(mouse_pos))
     draw_button(quit_rect, "Quit", quit_rect.collidepoint(mouse_pos))
 
-    # --- click handling ---
     if event and event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
         if new_rect.collidepoint(event.pos):
             return True
@@ -91,7 +87,6 @@ def setup_timer(screen, time_left: float, total_time, is_set_up_time, h, w, curr
         screen.fill((1, 61, 1))
         bar_color = (0, 255, 0)
 
-    # Bar size
     bar_w = w * 0.65
     bar_h = h * 0.14
 
@@ -104,7 +99,7 @@ def setup_timer(screen, time_left: float, total_time, is_set_up_time, h, w, curr
     fill_x = bar_x + (bar_w - progress_width)
     pygame.draw.rect(screen, bar_color, (fill_x, bar_y, progress_width, bar_h), border_radius=10)
 
-    font = pygame.font.SysFont(None, int(bar_h * 0.6))
+    font = pygame.font.SysFont(None, int(bar_h * 1.2))
     if time_left > 3600:
         time_text = f"{int((time_left // 3600))}:{int((time_left % 3600) // 60):02d}:{int(time_left % 60):02d}"
     elif time_left > 60:
@@ -156,7 +151,7 @@ def draw_rocks(screen, current_end: int, is_set_up_time: bool, h: int, w: int,
     box_height = box_bottom - box_top
     box_width = w * 0.95
 
-    cols = 8
+    cols = gm.get_rock_tracker.get_total_rocks_per_end // 2
     rows = 2
     gap_ratio = 0.05
 
@@ -170,13 +165,11 @@ def draw_rocks(screen, current_end: int, is_set_up_time: bool, h: int, w: int,
     start_x = (w - total_w) // 2
     start_y = box_top + (box_height - total_h) // 2
 
-    # --- Load images ---
     red_png = pygame.image.load("yellow_rock.png").convert_alpha()
     yellow_png = pygame.image.load("red_rock.png").convert_alpha()
     red_stone = pygame.transform.smoothscale(red_png, (stone_size, stone_size))
     yellow_stone = pygame.transform.smoothscale(yellow_png, (stone_size, stone_size))
 
-    # --- Rocks left ---
     try:
         rocks_left = gm.get_rock_tracker.get_rocks_left_in_end
         percent_thrown = gm.get_rock_tracker.get_current_rock().check_rock_thrown_precent()
@@ -184,11 +177,9 @@ def draw_rocks(screen, current_end: int, is_set_up_time: bool, h: int, w: int,
     except Exception:
         return
 
-    # Max rocks (always 16 for fours)
     max_rocks = cols * rows
     rocks_thrown = max_rocks - rocks_left
 
-    # --- Draw column by column ---
     rock_index = 0
     for col in range(cols):
         for row in range(rows):  # row 0 = red, row 1 = yellow
@@ -221,47 +212,3 @@ def draw_play_screen(screen, current_end, is_set_up_time: bool, game_manager, ti
                game_manager)
 
 
-if __name__ == "__main__":
-    pygame.init()
-    clock = pygame.time.Clock()
-
-    screen = pygame.display.set_mode((0, 0), pygame.RESIZABLE)
-    pygame.display.set_caption("Curling Timer")
-
-    is_set_up = False
-    time_left = 10000
-    total_time = 60000
-    current_end = 1
-
-    running = True
-    while running:
-        event = None
-        for e in pygame.event.get():
-            if e.type == pygame.QUIT:
-                running = False
-            elif e.type == pygame.VIDEORESIZE:
-                screen = pygame.display.set_mode((e.w, e.h), pygame.RESIZABLE)
-            else:
-                event = e
-
-        time_left -= clock.get_time() / 1000
-        if time_left < 0:
-            time_left = 0
-
-        screen_width, screen_height = screen.get_size()
-
-        draw_play_screen(
-            screen,
-            current_end=current_end,
-            is_set_up_time=is_set_up,
-            time_left=time_left,
-            height=screen_height,
-            width=screen_width,
-            total_time=total_time,
-        )
-
-        pygame.display.flip()
-        clock.tick(30)
-
-    pygame.quit()
-    sys.exit()

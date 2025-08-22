@@ -66,7 +66,7 @@ def main():
     screen_width = info.current_w
     screen_height = info.current_h
 
-    screen = pygame.display.set_mode((screen_width, screen_height), pygame.RESIZABLE)
+    screen = pygame.display.set_mode((screen_width, screen_height), pygame.FULLSCREEN)
 
     game_config = GameConfig()
     screen_manager = ScreenManager(screen, screen_width, screen_height)

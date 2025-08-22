@@ -109,6 +109,9 @@ class RockTracker:
     @property
     def get_current_end(self):
         return self._current_end
+    @property
+    def get_total_rocks_per_end(self):
+        return self._total_rocks_per_end
 
 
 class DoublesTracker(RockTracker):
