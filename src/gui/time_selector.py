@@ -27,7 +27,7 @@ class TimeSelector:
 
     def draw(self):
         # Draw container
-        pygame.draw.rect(self.screen, (136, 192, 208), self.rect, border_radius=8)
+        pygame.draw.rect(self.screen, (255,255,255), self.rect, border_radius=8)
 
         # Draw label
         label_surf = self.label_font.render(self.label, True, (236, 239, 244), )
@@ -36,7 +36,7 @@ class TimeSelector:
 
         # Draw time
         time_text = self._format_time()
-        time_surf = self.font.render(time_text, True, (236, 239, 244), )
+        time_surf = self.font.render(time_text, True, (0,0,0), )
         time_rect = time_surf.get_rect(center=self.rect.center)
         self.screen.blit(time_surf, time_rect)
 

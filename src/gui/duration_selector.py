@@ -24,14 +24,14 @@ class DurationSelector:
                                         self.button_width, self.button_height)
 
     def draw(self):
-        pygame.draw.rect(self.screen, (136, 192, 208), self.rect, border_radius=8)
+        pygame.draw.rect(self.screen, (255, 255, 255), self.rect, border_radius=8)
 
         label_surf = self.label_font.render(self.label, True, (236, 239, 244))
         label_pos = (self.rect.centerx - label_surf.get_width() // 2, self.rect.top - self.label_font.get_height() - 5)
         self.screen.blit(label_surf, label_pos)
 
         duration_text = f"{self.minutes} min"
-        text_surf = self.font.render(duration_text, True, (236, 239, 244))
+        text_surf = self.font.render(duration_text, True, (0,0,0))
         text_rect = text_surf.get_rect(center=self.rect.center)
         self.screen.blit(text_surf, text_rect)
 

@@ -74,18 +74,15 @@ def setup_timer(screen, time_left: float, total_time, is_set_up_time, h, w, curr
                 is_break_time=None):
     if is_set_up_time:  # set up time
         screen.fill((164, 160, 112))
-        bar_color = (255, 255, 0)
     elif is_break_time:
         screen.fill((77, 77, 77))
-        bar_color = (0, 195, 255)
     elif time_left <= 0 or current_end <= 0:  # ends game
         end_game_screen(screen)
     elif current_end >= 8 or time_left <= 900:
-        screen.fill((139, 0, 0))
-        bar_color = (0, 255, 0)
+        screen.fill((255,0,0))
     else:  # Game time
-        screen.fill((1, 61, 1))
-        bar_color = (0, 255, 0)
+        screen.fill((0, 255,0))
+    bar_color = (0,255,251)
 
     bar_w = w * 0.65
     bar_h = h * 0.14

@@ -15,7 +15,7 @@ class ScreenManager:
         self.screen_width = screen_width
         self.screen_height = screen_height
         self.default_font = pygame.font.SysFont('Segoe UI', max(36, screen_height // 24), bold=True)
-        self.default_background_color = (46, 52, 64)
+        self.default_background_color = (0,0,0)
         self.start_selector = None
         self.duration_selector = None
 

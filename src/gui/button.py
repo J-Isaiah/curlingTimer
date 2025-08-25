@@ -12,8 +12,8 @@ class Button:
             rect: Tuple[int, int, int, int],
 
             font: Font,
-            color: Tuple[int, int, int] = (136, 192, 208),
-            text_color: Tuple[int, int, int] =(236, 239, 244),
+            color: Tuple[int, int, int] = (255,255,255),
+            text_color: Tuple[int, int, int] =(0, 0, 1),
             text: str = 'Text Missing',
     ) -> None:
         self.rect: Rect = pygame.Rect(rect)
