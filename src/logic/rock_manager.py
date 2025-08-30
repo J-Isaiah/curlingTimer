@@ -33,7 +33,7 @@ class Rock:
 
 
 class RockTracker:
-    def __init__(self, total_rocks, end_break: int):
+    def __init__(self, total_rocks, end_break: int, time_mappings):
         self._end_break = end_break
         self.break_end_time = 0
         self.end_break_start_time = 0
@@ -43,7 +43,7 @@ class RockTracker:
         self.rocks_remaining_in_the_end = self._total_rocks_per_end
         self.current_rock = 0
         self._displayed_rocks = []
-        self.time_mapping = []
+        self.time_mapping = time_mappings
         self.current_end_break = 0
         self.in_end_break = False
         self.end_started = False
@@ -109,20 +109,39 @@ class RockTracker:
     @property
     def get_current_end(self):
         return self._current_end
+
     @property
     def get_total_rocks_per_end(self):
         return self._total_rocks_per_end
 
 
+def scale_times(time_mappings, default_time, game_duration):
+    scaled_times = []
+
+    for mapping in time_mappings:
+        scaled_times.append(mapping * max((game_duration / default_time), 1))
+
+    print(scaled_times)
+    return scaled_times
+
+
 class DoublesTracker(RockTracker):
-    def __init__(self):
-        super().__init__(total_rocks=10, end_break=10)
-        self.time_mapping = [55, 55, 60, 60, 65]
+    def __init__(self, game_duration=5400):
+        self._default_time = 5400
+        self._scaling_factor = game_duration
+        self.default_mappings = scale_times([55, 55, 60, 60, 65], self._default_time, game_duration)
+        print('defaultmappings', self.default_mappings)
+
+        super().__init__(total_rocks=10, end_break=10, time_mappings=self.default_mappings)
+
         print('DOUBLES TRACKER CREATED ')
 
 
 class FoursTracker(RockTracker):
-    def __init__(self):
-        super(FoursTracker, self).__init__(total_rocks=16, end_break=5)
-        self.time_mapping = [45, 45, 45, 50, 55, 60, 65, 65]
+    def __init__(self, game_duration=7200):
+        self._default_time = 7200
+        self._scaling_factor = game_duration
+        self.default_mappings = scale_times([45, 45, 45, 50, 55, 60, 65, 65], self._default_time, game_duration)
+
+        super(FoursTracker, self).__init__(total_rocks=16, end_break=5, time_mappings=self.time_mapping)
         print('FOURSE TRACKER CREATED ')

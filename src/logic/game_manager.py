@@ -31,9 +31,9 @@ class GameManager:
         self._timer = Timer(self._scheduled_start_time + 3, game_length=self.game_duration)
 
         if self.config.game_mode == GameMode.FOURS:
-            self._rock_tracker = FoursTracker()
+            self._rock_tracker = FoursTracker(self.game_duration)
         else:
-            self._rock_tracker = DoublesTracker()
+            self._rock_tracker = DoublesTracker(self.game_duration)
 
         self.game_status = GameState.START
 
