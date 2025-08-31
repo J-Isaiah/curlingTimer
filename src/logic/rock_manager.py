@@ -117,24 +117,34 @@ class RockTracker:
         return self._total_rocks_per_end
 
 
-def scale_times(time_mappings, default_time, game_duration):
+def scale_times(time_mappings, default_time, game_duration, last_end_time, break_time):
     scaled_times = []
+    scaler_value = max((game_duration / default_time), 1)
+    scaled_last_end_time = last_end_time * scaler_value
+    scaled_break_time = break_time * scaler_value
 
     for mapping in time_mappings:
-        scaled_times.append(mapping * max((game_duration / default_time), 1))
+        scaled_times.append(mapping * scaler_value)
 
     print(scaled_times)
-    return scaled_times
+    return scaled_times, scaled_last_end_time, scaled_break_time
 
 
 class DoublesTracker(RockTracker):
     def __init__(self, game_duration=5400):
         self._default_time = 5400
         self._scaling_factor = game_duration
-        self.default_mappings = scale_times([55, 55, 60, 60, 65], self._default_time, game_duration)
+        self.last_end_time = 600
+        self.break_time = 60
+
+        self.default_mappings, self.last_end_time_scaled, self.break_time = scale_times([50, 50, 50, 60, 60],
+                                                                                        self._default_time,
+                                                                                        game_duration,
+                                                                                        last_end_time=self.last_end_time)
         print('defaultmappings', self.default_mappings)
 
-        super().__init__(total_rocks=10, end_break=10, time_mappings=self.default_mappings, last_end_time=600)
+        super().__init__(total_rocks=10, end_break=self.break_time, time_mappings=self.default_mappings,
+                         last_end_time=self.last_end_time_scaled)
 
         print('DOUBLES TRACKER CREATED ')
 
@@ -143,9 +153,14 @@ class FoursTracker(RockTracker):
     def __init__(self, game_duration=7200):
         self._default_time = 7200
         self._scaling_factor = game_duration
-        # self.default_mappings = scale_times([45, 45, 45, 50, 55, 60, 65, 65], self._default_time, game_duration)
+        self.break_time = 40
+        self.last_end_time = 900
+        self.default_mappings, self.last_end_time_scaled, self.break_time = scale_times(
+            [45, 45, 45, 50, 55, 60, 65, 65],
+            self._default_time, game_duration,
+            last_end_time=self.last_end_time,
+            break_time=self.break_time)
 
-        self.default_mappings = [1, 1, 1, 1, 1, 1, 1, 1]
         super(FoursTracker, self).__init__(total_rocks=16, end_break=5, time_mappings=self.default_mappings,
                                            last_end_time=900)
         print('FOURSE TRACKER CREATED ')
