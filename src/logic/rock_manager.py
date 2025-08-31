@@ -140,7 +140,8 @@ class DoublesTracker(RockTracker):
         self.default_mappings, self.last_end_time_scaled, self.break_time = scale_times([50, 50, 50, 60, 60],
                                                                                         self._default_time,
                                                                                         game_duration,
-                                                                                        last_end_time=self.last_end_time)
+                                                                                        last_end_time=self.last_end_time,
+                                                                                        break_time=self.break_time)
         print('defaultmappings', self.default_mappings)
 
         super().__init__(total_rocks=10, end_break=self.break_time, time_mappings=self.default_mappings,
