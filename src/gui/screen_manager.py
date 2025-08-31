@@ -58,7 +58,7 @@ class ScreenManager:
 
     def init_and_draw_settings(self, game_mode: GameMode, ):
         button_height = self.screen_height // 16
-        button_width = self.screen_width // 8
+        button_width = self.screen_width // 6
         total_height = 2 * button_height
         start_y = (self.screen_height - total_height) // 1
         button_center_x = (self.screen_width - button_width) // 2

@@ -141,7 +141,7 @@ def main():
                     # Pre Game Count Down
                     print(game_manager.get_timer.get_pre_game_time())
                     print('still in if')
-                    draw_play_screen(screen, current_end=None, is_set_up_time=True,
+                    showing_end_screen = draw_play_screen(screen, current_end=None, is_set_up_time=True,
                                      time_left=game_manager.get_timer.get_pre_game_time(), height=screen_height,
                                      width=screen_width, total_time=game_manager.get_timer.get_pre_game_duration,
                                      game_manager=game_manager)
@@ -174,7 +174,7 @@ def main():
 
                             # Break Screen
                             game_manager.handle_break()
-                            draw_play_screen(screen, current_end=game_manager.get_rock_tracker.get_current_end,
+                            showing_end_screen = draw_play_screen(screen, current_end=game_manager.get_rock_tracker.get_current_end,
                                              is_set_up_time=False,
                                              time_left=game_manager.get_timer.get_remaining_game_time(),
                                              height=screen_height, width=screen_width,
@@ -188,7 +188,7 @@ def main():
                             print('handle game time')
                             print('IS BREAK?', game_manager.get_rock_tracker.is_in_break())
                             game_manager_state = game_manager.handle_end()
-                            draw_play_screen(screen, current_end=game_manager.get_rock_tracker.get_current_end,
+                            showing_end_screen = draw_play_screen(screen, current_end=game_manager.get_rock_tracker.get_current_end,
                                              is_set_up_time=False,
                                              time_left=game_manager.get_timer.get_remaining_game_time(),
                                              height=screen_height, width=screen_width,

@@ -33,7 +33,7 @@ class Rock:
 
 
 class RockTracker:
-    def __init__(self, total_rocks, end_break: int, time_mappings):
+    def __init__(self, total_rocks, end_break: int, time_mappings, last_end_time):
         self._end_break = end_break
         self.break_end_time = 0
         self.end_break_start_time = 0
@@ -49,6 +49,7 @@ class RockTracker:
         self.end_started = False
         self.is_first_end = True
         self.is_last_end = False
+        self.last_end_time = last_end_time
 
     def start_new_end(self):
 
@@ -81,7 +82,8 @@ class RockTracker:
 
     @property
     def is_end_over(self):
-        return self.rocks_remaining_in_the_end == 0
+        print('Checking Is end over', self.rocks_remaining_in_the_end, self.rocks_remaining_in_the_end <= 0)
+        return self.rocks_remaining_in_the_end <= 0
 
     @property
     def get_rocks_left_in_end(self):
@@ -132,7 +134,7 @@ class DoublesTracker(RockTracker):
         self.default_mappings = scale_times([55, 55, 60, 60, 65], self._default_time, game_duration)
         print('defaultmappings', self.default_mappings)
 
-        super().__init__(total_rocks=10, end_break=10, time_mappings=self.default_mappings)
+        super().__init__(total_rocks=10, end_break=10, time_mappings=self.default_mappings, last_end_time=600)
 
         print('DOUBLES TRACKER CREATED ')
 
@@ -141,7 +143,9 @@ class FoursTracker(RockTracker):
     def __init__(self, game_duration=7200):
         self._default_time = 7200
         self._scaling_factor = game_duration
-        self.default_mappings = scale_times([45, 45, 45, 50, 55, 60, 65, 65], self._default_time, game_duration)
+        # self.default_mappings = scale_times([45, 45, 45, 50, 55, 60, 65, 65], self._default_time, game_duration)
 
-        super(FoursTracker, self).__init__(total_rocks=16, end_break=5, time_mappings=self.time_mapping)
+        self.default_mappings = [1, 1, 1, 1, 1, 1, 1, 1]
+        super(FoursTracker, self).__init__(total_rocks=16, end_break=5, time_mappings=self.default_mappings,
+                                           last_end_time=900)
         print('FOURSE TRACKER CREATED ')

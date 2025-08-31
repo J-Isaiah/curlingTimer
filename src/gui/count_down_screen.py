@@ -71,18 +71,26 @@ def end_game_screen(screen_manager, game_config=None, event=None):
 
 
 def setup_timer(screen, time_left: float, total_time, is_set_up_time, h, w, current_end=None,
-                is_break_time=None):
+                is_break_time=None, game_manager=None):
+    print('Is game comming to an end check', game_manager.get_rock_tracker.is_last_end,
+          game_manager.get_rock_tracker.get_rocks_left_in_end, game_manager.get_rock_tracker.get_rocks_left_in_end <= 0)
     if is_set_up_time:  # set up time
         screen.fill((164, 160, 112))
+
+    elif time_left <= 0 or current_end <= 0 or (
+            game_manager.get_rock_tracker.is_last_end and game_manager.get_rock_tracker.get_rocks_left_in_end <= 0):  # ends game
+        print('ending Game')
+        end_game_screen(screen)
+        return True
     elif is_break_time:
         screen.fill((77, 77, 77))
-    elif time_left <= 0 or current_end <= 0:  # ends game
-        end_game_screen(screen)
-    elif current_end >= 8 or time_left <= 900:
-        screen.fill((255,0,0))
+    elif current_end >= 8 or time_left <= game_manager.get_rock_tracker.last_end_time:
+        if time_left <= game_manager.get_rock_tracker.last_end_time:
+            game_manager.get_rock_tracker.is_last_end = True
+        screen.fill((135, 0, 0))
     else:  # Game time
-        screen.fill((0, 255,0))
-    bar_color = (0,255,251)
+        screen.fill((87, 183, 87))
+    bar_color = (0, 255, 251)
 
     bar_w = w * 0.65
     bar_h = h * 0.14
@@ -106,6 +114,7 @@ def setup_timer(screen, time_left: float, total_time, is_set_up_time, h, w, curr
     time_text = font.render(f"{time_text}s", True, (0, 0, 0))
     text_rect = time_text.get_rect(center=(w / 2, bar_y + bar_h / 2))
     screen.blit(time_text, text_rect)
+    return False
 
 
 def draw_headding(screen, current_end: int, is_set_up_time: bool, h: int, w: int, time_left: float,
@@ -202,10 +211,12 @@ def draw_rocks(screen, current_end: int, is_set_up_time: bool, h: int, w: int,
 
 def draw_play_screen(screen, current_end, is_set_up_time: bool, game_manager, time_left: float, height, width,
                      total_time, is_break_time=None, break_time_left=None):
-    setup_timer(screen=screen, time_left=time_left, total_time=total_time,
-                is_set_up_time=is_set_up_time, h=height, w=width, current_end=current_end, is_break_time=is_break_time)
+    game_over = setup_timer(screen=screen, time_left=time_left, total_time=total_time,
+                            is_set_up_time=is_set_up_time, h=height, w=width, current_end=current_end,
+                            is_break_time=is_break_time,
+                            game_manager=game_manager)
     draw_headding(screen, current_end, is_set_up_time, height, width, time_left, is_break_time, break_time_left)
     draw_rocks(screen, current_end, is_set_up_time, height, width, time_left, is_break_time, break_time_left,
                game_manager)
 
-
+    return game_over
